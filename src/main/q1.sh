@@ -5,6 +5,15 @@ set -eu
 input=${1:?需要输入目录}
 output=${2:?需要输出目录}
 
-# TODO：删除下方提示和 exit 77，再填写你的命令。
-printf '%s\n' 'Q1 尚未实现' >&2
-exit 77
+# Create the directory before writing the result files.
+mkdir -p "$output"
+
+# Change directories in a subshell so later paths remain unchanged.
+(
+    cd "$input/handover"
+    pwd -P
+) > "$output/location.txt"
+
+# Copy the complete contents without appending on repeated runs.
+cat "$input/handover/.robot-id" > "$output/robot-id.txt"
+cat "$input/notes/welcome.txt" > "$output/welcome.txt"
