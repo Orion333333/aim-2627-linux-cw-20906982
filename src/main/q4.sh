@@ -5,6 +5,22 @@ set -eu
 input=${1:?需要输入目录}
 output=${2:?需要输出目录}
 
-# TODO：删除下方提示和 exit 77，再填写你的命令。
-printf '%s\n' 'Q4 尚未实现' >&2
-exit 77
+mkdir -p "$output"
+cat "$input/boot.log" "$input/run.log" > "$output/all.log"
+# No matching log entries is a valid input, not a command failure.
+if grep '^ERROR ' "$output/all.log" > "$output/errors.log"; then
+    :
+else
+    status=$?
+    [ "$status" -eq 1 ] || exit "$status"
+fi
+if grep -E '^(WARN|ERROR) ' "$output/all.log" > "$output/attention.log"; then
+    :
+else
+    status=$?
+    [ "$status" -eq 1 ] || exit "$status"
+fi
+tail -n 5 "$output/all.log" > "$output/recent.log"
+head -n 3 "$output/errors.log" > "$output/first-errors.log"
+count=$(wc -l < "$output/errors.log")
+printf '%d\n' "$count" > "$output/error-count.txt"

@@ -5,15 +5,13 @@ set -eu
 input=${1:?需要输入目录}
 output=${2:?需要输出目录}
 
-# Create the directory before writing the result files.
 mkdir -p "$output"
 
-# Change directories in a subshell so later paths remain unchanged.
+# Limit the directory change to this subshell.
 (
     cd "$input/handover"
     pwd -P
 ) > "$output/location.txt"
 
-# Copy the complete contents without appending on repeated runs.
 cat "$input/handover/.robot-id" > "$output/robot-id.txt"
 cat "$input/notes/welcome.txt" > "$output/welcome.txt"
